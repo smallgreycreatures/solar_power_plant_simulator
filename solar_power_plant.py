@@ -4,11 +4,11 @@ import math
 from tkinter import *
 import plotly
 class Power_Plant(object):
-	def mean_value(energy_production_list):
+	def calculate_mean_value(energy_production_list):
 
 		return sum(energy_production_list)/len(energy_production_list)
 
-	def standard_deviation(energy_production_list):
+	def calculate_standard_deviation(energy_production_list):
 		total = 0
 		for i in energy_production_list:
 			total += math.pow((i - (sum(energy_production_list) / len(energy_production_list))), 2)

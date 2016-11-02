@@ -15,10 +15,11 @@ Linda wants to see how the energy production for a solar plant outside of Tokyo 
 ```
 class Power_Plant(object):
 	"""Super class for power plants."""
-	def mean_value(energy_production_list):
+	
+	def calculate_mean_value(energy_production_list):
 		"""Calculates the mean value of energy produced during a given time. The number of items in the list is considered to give the time."""
 
-	def standard_deviation(energy_production_list):
+	def calculate_standard_deviation(energy_production_list):
 	"""Calculates the standard deviation of the energy produced during a period of time. The number of items in the list is considered to give the time."""
 
 class Solar_Power_Plant(object):
@@ -78,4 +79,4 @@ def quit():
 ```
 
 ##Program flow and data flow
-The program starts in the ```main_menu()``` function. The user calls either ```calculate_solar_power()``` or ```calculate_wind_power()``` where a solar or wind power plant object with class variables as input to their constructors are created. If the user created a solar power plant latitudes are collected from the user and for each latitude the solar power plants function energy_calculator(latitude) is called. This function iterates over all days of a year and calls the functions solar_energy_calculator, mean_value_calculator and standard_deviation_calculator. A tuple is returned to the main calculate_solar_power function and depending on the user save_to_file(), generate_bar_chart() or generate_table() is called. Pressing the x-button in the left corner calls the quit() function which exits the program.
+The program starts in the ```main_menu()``` function. The user calls either ```calculate_solar_power()``` or ```calculate_wind_power()`` where a solar or wind power plant object with class variables as input to their constructors are created. If the user created a solar power plant latitudes are collected from the user and for each latitude the solar power plants function ```energy_calculator(latitude)``` is called. This function iterates over all days of a year and calls the functions ```solar_energy_calculator()```, ```mean_value_calculator()``` and ```standard_deviation_calculator()```. From ```solar_energy_calculator()``` the function ```latitude_time(time, latitude)```is called.  A tuple is returned to the main ```calculate_solar_power()``` function and depending on the user ```save_to_file()```, ```generate_bar_chart()``` or ```generate_table()``` is called. Pressing the x-button in the left corner calls the ```quit()```function which exits the program.
