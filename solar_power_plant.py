@@ -41,6 +41,9 @@ class Solar_Power_Plant(Power_Plant):
 		
 		max_value = 0
 		min_value = 0
+		#Index identifies month, value identifies actual value.
+		max_list = []
+		min_list = []
 
 		for time in range(360):
 			sun_factor = random.randrange(0,1)
@@ -56,7 +59,9 @@ class Solar_Power_Plant(Power_Plant):
 			if (time%30)==0 and time != 0:
 				month_mean_value_list.append(mean_value(energy_production_list[(time-30,time)]))
 				month_standard_deviation_list.append(standard_deviation(energy_production_list[time-30,time]))
-				##implement dict to save day and man,min values
+				
+				min_list.append(min_value)
+				max_list.append(max_value)
 				max_value = 0
 				min_value = 0
 

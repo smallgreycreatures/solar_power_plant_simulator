@@ -15,7 +15,7 @@ Linda wants to see how the energy production for a solar plant outside of Tokyo 
 ```
 class Power_Plant(object):
 	"""Super class for power plants."""
-	
+
 	def calculate_mean_value(energy_production_list):
 		"""Calculates the mean value of energy produced during a given time. The number of items in the list is considered to give the time."""
 
@@ -34,11 +34,11 @@ class Solar_Power_Plant(object):
 		"""Returns the material constant"""
 
 	def energy_caluclator(latitude):
-		"""Iterates over all days per year and for each day the energy generated is calculated through the calling of help methods. The function returns a tuple with the standard deviation, mean value and two lists. One with the standard deviation for all months and the other with the mean value for all months."""
+		"""Iterates over all days per year and for each day the energy generated is calculated through the calling of help methods. The function returns a tuple with the standard deviation, mean value and two lists. One with the standard deviation for all months another with the mean value for all months, one with the max value for all month and one with the minimum value for all months.."""
 
 	def solar_energy_calculator(sun_factor, time, latitude):
 		"""Help method for energy_calculator that calculates 
-			the formula W(t) =area·material_constant·sun_factor·latitude_time(t, latitude)."""
+			the formula W(t) = area·material_constant·sun_factor·latitude_time(t, latitude)."""
 	def latitude_time(time, latitude):
 		"""Calculates v = ((23.5)·sin((pi(time-80))/180)+90-latitude)/90 for latitudes 0 < latitude < 90"""
 
@@ -50,7 +50,7 @@ class Wind_Power_Plant(object):
 	def get_rotor_diameter(self):
 		"""Returns rotor diameter"""
 	def wind_power_plant_calculator(wind_power_plant, time):
-		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The prodcution is season dependent because of stronger winds in spring and autumn. The function returns a tuple with the standard deviation, mean value and two lists. One with the standard deviation for all months and the other with the mean value for all months."""
+		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The prodcution is season dependent because of stronger winds in spring and autumn. The function returns a tuple with the standard deviation, mean value and four lists. One with the standard deviation for all months another with the mean value for all months, one with the max value for all month and one with the minimum value for all months."""
 
 
 def main_menu():
