@@ -34,13 +34,36 @@ class Solar_Power_Plant(Power_Plant):
 		return v
 
 	def energy_caluclator(latitude):
-		for latitude in latitude_list:
-			energy_production_list = []
-			for time in range(360):
-				sun_factor = random.randrange(0,1)
-				energy_production_list.append(solar_energy_calculator(sun_factor, time, latitude))
-			mean_value(energy_production_list)
-			standard_deviation(energy_production_list)
+		
+		energy_production_list = []
+		month_mean_value_list =[]
+		month_standard_deviation_list = []
+		
+		max_value = 0
+		min_value = 0
+
+		for time in range(360):
+			sun_factor = random.randrange(0,1)
+			energy_produced = solar_energy_calculator(sun_factor, time, latitude)
+			energy_production_list.append(energy_produced)
+
+			if energy_produced >= max_value:
+				max_value = energy_produced
+
+			elif energy_produced <= min_value:
+				min_value = energy_produced
+
+			if (time%30)==0 and time != 0:
+				month_mean_value_list.append(mean_value(energy_production_list[(time-30,time)]))
+				month_standard_deviation_list.append(standard_deviation(energy_production_list[time-30,time]))
+				##implement dict to save day and man,min values
+				max_value = 0
+				min_value = 0
+
+		mean_value = mean_value(energy_production_list)
+		standard_deviation = standard_deviation(energy_production_list)
+	return (mean_value, standard_deviation, month_mean_value_list, month_standard_deviation_list)
+
 class Wind_Power_Plant(Power_Plant):
 
 	def __init__(self, rotor_diameter):
@@ -102,7 +125,8 @@ def solar_power_plant_calculation():
 	latitude_list = []
 	latitude_list.append(lat_1)
 	latitude_list.append(lat_2)
-
+	for latitude in latitude_list:
+		solar_plant.energy_caluclator(latitude)
 
 
 
