@@ -7,29 +7,8 @@ import tkinter.font as tkFont
 import tkinter.ttk as ttk
 import tkinter as tk
 
-class Power_Plant(object):
 
-
-
-	
-	def collect_month_information(self, energy_produced, max_value, min_value, time, energy_production_list, month_mean_value_list, month_standard_deviation_list, min_list, max_list):
-		if energy_produced >= max_value:
-			max_value = energy_produced
-
-		elif energy_produced <= min_value:
-			min_value = energy_produced
-
-		if (time%30)==0 and time != 0:
-			month_mean_value_list.append(self.calculate_mean_value(energy_production_list[time-30:time]))
-			month_standard_deviation_list.append(self.calculate_standard_deviation(energy_production_list[time-30:time]))
-				
-			min_list.append(min_value)
-			max_list.append(max_value)
-			max_value = 0
-			min_value = 0
-
-
-class Solar_Power_Plant(Power_Plant):
+class Solar_Power_Plant(object):
 
 	def __init__(self, area, material_constant, latitude_list):
 		self.area = area
@@ -88,7 +67,7 @@ class Solar_Power_Plant(Power_Plant):
 	def capabilities(self):
 		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
 
-class Wind_Power_Plant(Power_Plant):
+class Wind_Power_Plant(object):
 
 	def __init__(self, rotor_diameter):
 		#Rotor diameter can be 	25-50m
@@ -246,7 +225,7 @@ def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
 	data = energy_tuple[2]
 
 	root = tk.Tk()
-	root.title("Bar Graph")
+	root.title("Power Production Bar Graph")
 	canvas_width = 600
 	canvas_height = 350
 	canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg = 'white')
@@ -270,7 +249,7 @@ def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
 def display_table(power_plant_dict, power_plant, energy_production_list):
 	energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
 	root = tk.Tk()
-	root.title("Table")
+	root.title("Power Production Table")
 	table = Table(root, 13, 5)
 	table.pack(side ="top", fill="x")
 	table.set(0,0, "Month")
@@ -278,8 +257,8 @@ def display_table(power_plant_dict, power_plant, energy_production_list):
 	table.set(0,2, "Standard deviation")
 	table.set(0,3, "Min value")
 	table.set(0,4, "Max value")
-	print(energy_tuple)
-	print(len(energy_tuple[2]))
+	
+	
 	for index in range(12):
 		table.set(index+1, 0, month_number_dict[index])
 		table.set(index+1, 1, str("%.4f" % round(energy_tuple[2][index],4)))
