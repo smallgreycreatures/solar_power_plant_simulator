@@ -51,7 +51,7 @@ class Solar_Power_Plant(Power_Plant):
 		else: #v < 0
 			return 0
 
-	def energy_caluclator(self):
+	def energy_calculator(self):
 		latitude_dict = {}
 
 	#latitude_list.append(lat_2)
@@ -101,6 +101,66 @@ class Solar_Power_Plant(Power_Plant):
 	def capabilities(self):
 		return "Area,soltal,latitud,dag,solighetsfaktor,f(t,latitud),W(t)"
 
+class Wind_Power_Plant(Power_Plant):
+
+	def __init__(self, rotor_diameter):
+		#Rotor diameter can be 	25-50m
+		self.rotor_diameter = rotor_diameter
+
+	def get_rotor_diameter(self):
+		return self.rotor_diameter
+
+	def wind_variation(self, time):
+			big_wind_factor = 20
+			small_wind_factor = 10
+			rand_factor = random.random()
+			if time < 60:
+				return small_wind_factor*rand_factor
+			elif time < 150:
+				return big_wind_factor *rand_factor
+				
+			elif time < 270:
+				return small_wind_factor *rand_factor
+				
+			elif time < 330:
+				return big_wind_factor *rand_factor
+			else:
+				return small_wind_factor*rand_factor
+
+	def energy_calculator(self):
+		wind_power_dict = {}
+		day_list = []
+		for time in range(360):
+			wind_variation = self.wind_variation(time)
+			energy_produced = wind_variation*self.get_rotor_diameter()
+			day_list.append((time, energy_produced, wind_variation, self.get_rotor_diameter()))
+
+		
+		wind_power_dict[0] = day_list
+		return wind_power_dict
+
+	def capabilities(self):
+		return "Rotordiameter, Dag, W(t), Vindvariation"
+class CustomDialog:
+
+    def __init__(self, parent, message_box_title_list):
+
+        top = self.top = Toplevel(parent)
+        for title in message_box_title_list:
+
+        	Label(top, text=title).pack()
+
+        	self.e = Entry(top)
+        	self.e.pack(padx=5)
+
+        b = Button(top, text="OK", command=self.ok)
+        b.pack(pady=5)
+
+    def ok(self):
+
+        print ("value is", self.e.get())
+        self.top.destroy()
+
 month_day_dict = {0: "Januari", 30: "Februari", 60: "Mars", 90: "April", 120:"Maj", 150: "Juni",
 					180: "Juli", 210:"Augusti", 240:"September", 270:"Oktober", 300:"November", 330:"December"}
 def calculate_mean_value(energy_production_list):
@@ -114,128 +174,123 @@ def calculate_standard_deviation(energy_production_list):
 	return math.sqrt((1/(len(energy_production_list)-1))*total)
 
 def main_function():
-	root = Tk()
-	main_frame = Frame(root)
-	
-	#Lower part of GUI
-	bottomframe = Frame(root)
-	bottomframe.pack(side = BOTTOM)
+	#root = Tk()
+	#solar_button = Button(root, text="Solar")
+	#wind_button = Button(root, text="Wind")
+	#solar_button.grid(row =0, column=0)
+	#wind_button.grid(row=1, column=1)
 
-	#Top part of GUI
-	top_frame = Frame(root)
-	top_frame.pack(side = TOP)
-	main_frame.pack()
-	#header = Label(top_frame, text="Power Plant Simulator",command = solar_power_plant_calculation())
-	#header.pack(side = LEFT)
-	choice = 0
-	#Main Buttons
-	#solar_button = Button(top_frame, "Solar Calculator")
+	#solar or wind 0 or 1
+	#solar_button.configure(command=lambda: button_pressed(2, root))
+	#wind_button.configure(command=lambda: button_pressed(3))
+
+	#solar_button.pack()
+	#wind_button.pack()
+
 	#root.mainloop()
-	if choice == 0:
-		latitude_list = []
-		lat_1 = 80
-		latitude_list.append(lat_1)
-		solar_plant = Solar_Power_Plant(100,2,latitude_list)
-		power_calculation(solar_plant)
-	elif choice == 1:
-		wind_power_plant = Wind_Power_Plant(25)
+
 	#wind_power_plant_calculation()
+	running = True
+	while(running):
+		print("Welcome to Solar and Wind power plant simulator, what would you like to simulate?")
+
+		arg = user_input_int_handler("1. Solar Power Plant \n2. Wind Power Plant\n3. Quit", 1,3)
+		print (arg)
+		if arg == 1:
+			print ("wtf")
+			number_of_latitudes = user_input_int_handler("How many latitudes do you want to calculate?", 0, sys.maxsize)
+			latitude_list = []
+			for latitudes in range(number_of_latitudes):
+				latitude = user_input_float_handler("Enter a latitude: ", 0, 90)
+				latitude_list.append(latitude)
+			area = user_input_float_handler("Enter the area: ", 0, 1000) #max 1000m^2
+			material_constant = user_input_float_handler("Enter material constant: ", 0, 10) #max 10kWh/m^2
+			solar_plant = Solar_Power_Plant(area, material_constant, latitude_list)
+			power_calculation(solar_plant)
+		elif arg == 2:
+			rotor_diameter = user_input_float_handler("Enter rotor diameter: ", 25, 50)
+			wind_power_plant = Wind_Power_Plant(rotor_diameter)
+			power_calculation(wind_power_plant)
+		elif arg == 3:
+			running = False
+def button_pressed(arg, root):
+	print (arg)
+	d = CustomDialog(root, ["stuff", "more stuff"])
+
+
 
 def power_calculation(power_plant):
-	energy_dict = {}
-	energy_dict = power_plant.energy_caluclator()
+	power_plant_dict= {}
+	power_plant_dict = power_plant.energy_calculator()
 	energy_produced_list = []
-	for key in energy_dict:
-		day_data_list = energy_dict[key]
+	for key in power_plant_dict:
+		day_data_list = power_plant_dict[key]
 		for day_data_tuple in day_data_list:
 			energy_produced_list.append(day_data_tuple[1])
 
 	print(calculate_mean_value(energy_produced_list))
 	print(calculate_standard_deviation(energy_produced_list))
 
-	save_file(energy_dict, power_plant, "name.txt")
+	save_file(power_plant_dict, power_plant, "name.txt")
 
-def save_file(latitude_dict, power_plant, file_name):
+def save_file(power_plant_dict, power_plant, file_name):
 	column_headers = power_plant.capabilities()
-	data = column_headers
-	for latitude in latitude_dict:
-		day_data_list = latitude_dict[latitude]
+	data = column_headers + "\n"
+	for identifier in power_plant_dict: #for solar this is latitude
+		day_data_list = power_plant_dict[identifier]
 		for day_data_tuple in day_data_list:
-	#		print (day_data_tuple)
 			
 			day = day_data_tuple[0]
+			energy_produced = day_data_tuple[1]
+
 			if (day% 30) == 0:
 				data += (month_day_dict[day]+"\n")
-			energy_produced = day_data_tuple[1]
-			area = day_data_tuple[2]
-			material_constant = day_data_tuple[3]
-			sun_factor = day_data_tuple[4]
-			latitude = day_data_tuple[5]
-			
-			energy_function = day_data_tuple[6]
-			data += (str(area) +"\t" + str(material_constant) +"\t" + str(latitude) +"\t" + str(sun_factor) +"\t" + str(energy_produced) +"\t" + str(energy_function) + "\n")
+
+			if len(day_data_tuple) == 4:
+				wind_variation = day_data_tuple[2]
+				rotor_diameter = day_data_tuple[3]
+				data += (str(rotor_diameter) + "\t" + str(day) + "\t" + str(energy_produced) + "\t" + str(wind_variation) + "\n")
+
+			elif len(day_data_tuple) == 6:	
+				area = day_data_tuple[2]
+				material_constant = day_data_tuple[3]
+				sun_factor = day_data_tuple[4]
+				latitude = day_data_tuple[5]
+				energy_function = day_data_tuple[6]
+
+				data += (str(area) +"\t" + str(material_constant) +"\t" + str(latitude) +"\t" + str(sun_factor) +"\t" + str(energy_produced) +"\t" + str(energy_function) + "\n")
 	file = open(file_name, "w")
 
 	file.write(data)
 	file.close()
 			
 
-def user_input_int_handler(prompt):
+def user_input_int_handler(prompt, lower_lim, upper_lim):
 	while True:
 		try:
 			user_input = int(input(prompt))
+			if user_input > upper_lim and user_input < lower_lim:
+				print("Wrong choice: try again")
+				continue
 			return user_input
 		except:
-			print("Detta är inget heltal, försök igen")
+			print("This is no interger, try again: ")
+
+def user_input_float_handler(prompt, lower_lim, upper_lim):
+	while True:
+		try:
+			user_input = float(input(prompt))
+			if user_input > upper_lim and user_input < lower_lim:
+				print("Wrong choice: try again")
+				continue
+
+			return user_input
+		except:
+			print("This is no float, try again: ")
 main_function()
 
 
 
-class Wind_Power_Plant(Power_Plant):
 
-	def __init__(self, rotor_diameter):
-		#Rotor diameter can be 	25-50m
-		self.rotor_diameter = rotor_diameter
-
-	def get_rotor_diameter(self):
-		return self.rotor_diameter
-
-	def wind_power_plant_calculator(self):
-		energy_production_list = []
-		month_mean_value_list =[]
-		month_standard_deviation_list = []
-		
-		energy_produced = 0
-
-		max_value = 0	
-		min_value = 0
-		#Index identifies month, value identifies actual value.
-		max_list = []
-		min_list = []
-		for time in range(360):	
-			
-
-
-			
-			big_wind_factor = 20
-			small_wind_factor = 10
-			if time < 60:
-				energy_produced = small_wind_factor*self.get_rotor_diameter()
-			elif time < 150:
-				energy_produced = big_wind_factor *self.get_rotor_diameter()
-				
-			elif time < 270:
-				energy_produced = small_wind_factor *self.get_rotor_diameter()
-				
-			elif time < 330:
-				energy_produced = big_wind_factor *self.get_rotor_diameter()
-
-			energy_production_list.append(energy_produced)
-			super().collect_month_information(energy_produced, max_value, min_value, time, energy_production_list, month_mean_value_list, month_standard_deviation_list, min_list, max_list)
-			
-			print (max_value)
-		mean_value = super().calculate_mean_value(energy_production_list)
-		standard_deviation = super().calculate_standard_deviation(energy_production_list)
-		return (mean_value, standard_deviation, month_mean_value_list, month_standard_deviation_list)
 
 		
