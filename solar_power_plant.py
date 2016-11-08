@@ -1,8 +1,10 @@
 
 import random
 import math
-from tkinter import *
+import tkinter as tk
 import plotly
+import types
+import sys
 class Power_Plant(object):
 
 
@@ -195,9 +197,8 @@ def main_function():
 		print("Welcome to Solar and Wind power plant simulator, what would you like to simulate?")
 
 		arg = user_input_int_handler("1. Solar Power Plant \n2. Wind Power Plant\n3. Quit", 1,3)
-		print (arg)
+
 		if arg == 1:
-			print ("wtf")
 			number_of_latitudes = user_input_int_handler("How many latitudes do you want to calculate?", 0, sys.maxsize)
 			latitude_list = []
 			for latitudes in range(number_of_latitudes):
@@ -222,16 +223,93 @@ def button_pressed(arg, root):
 def power_calculation(power_plant):
 	power_plant_dict= {}
 	power_plant_dict = power_plant.energy_calculator()
-	energy_produced_list = []
+	energy_production_list = []
 	for key in power_plant_dict:
 		day_data_list = power_plant_dict[key]
 		for day_data_tuple in day_data_list:
-			energy_produced_list.append(day_data_tuple[1])
+			energy_production_list.append(day_data_tuple[1])
 
-	print(calculate_mean_value(energy_produced_list))
-	print(calculate_standard_deviation(energy_produced_list))
+	running = True
+	while running:
+		print("What do you want to do with the simulated data?")
+		arg = user_input_int_handler("1. Create a table \n2. Create a bar chart \n3. Save to file \n4. Go to main menu (data will be lost)", 1,4)
 
-	save_file(power_plant_dict, power_plant, "name.txt")
+		if arg == 1 or arg == 2 and type(power_plant).__name__ == "Solar_Power_Plant":
+			print ("Latitudes: ")
+			index = 1
+			for key in power_plant_dict:
+				print(index, ". ", key)
+
+			latitude = user_input_int_handler("Which latitude do you want to display? ", 1, index)
+			if arg == 2:
+				display_bar_graph(power_plant_dict, power_plant, energy_production_list)
+		elif arg == 3:
+			file_name = input("Enter a file name: ")
+			save_file(power_plant_dict, power_plant, file_name)
+		elif arg == 4:
+			return
+
+def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
+	
+	energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
+	data = energy_tuple[2]
+
+	root = tk.Tk()
+	root.title("Bar Graph")
+	canvas_width = 400
+	canvas_height = 350
+	canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg = 'white')
+	canvas.pack()
+
+	y_stretch = 15
+	y_gap = 20
+	x_stretch = 10
+	x_width = 20
+	x_gap = 20
+	for x, y in enumerate(data): #Calculates the rectangle coordinates for each bar
+		x0 = x*x_stretch + x*x_width + x_gap #Bottom left
+		y0 = canvas_height - (y * y_stretch + y_gap) # top left
+		x1 = x * x_stretch + x*x_width + x_width + x_gap # bottom right
+		y1 = canvas_height - y_gap #top right
+		canvas.create_rectangle(x0, y0, x1, y1, fill="red")
+		canvas.create_text(x0+2, y0, anchor=tk.SW, text=str("%.2f" % round(y,2)))
+	root.mainloop()
+
+def display_table(power_plant_dict, power_plant, latitude, energy_production_list):
+	root = tk.Tk()
+	root.title("Table")
+	canvas_width = 400
+	canvas_height = 350
+	canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg = 'white')
+	canvas.pack()
+
+
+def energy_produced_per_month(power_plant, energy_production_list):
+	max_list = []
+	min_list = []
+	month_mean_value_list = []
+	month_standard_deviation_list = []
+	max_value = 0
+	min_value = 0
+	for time, energy_produced in enumerate(energy_production_list):
+
+		if energy_produced >= max_value:
+			max_value = energy_produced
+	
+		elif energy_produced <= min_value:
+			min_value = energy_produced
+
+		if (time%30)==0 and time != 0:
+			print (time)
+			month_mean_value_list.append(calculate_mean_value(energy_production_list[time-30:time]))
+			month_standard_deviation_list.append(calculate_standard_deviation(energy_production_list[time-30:time]))
+				
+			min_list.append(min_value)
+			max_list.append(max_value)
+			max_value = 0
+			min_value = 0	
+
+	return (max_list, min_list, month_mean_value_list, month_standard_deviation_list)
 
 def save_file(power_plant_dict, power_plant, file_name):
 	column_headers = power_plant.capabilities()
