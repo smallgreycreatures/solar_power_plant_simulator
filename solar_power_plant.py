@@ -1,10 +1,12 @@
 
 import random
 import math
-import tkinter as tk
-import plotly
 import types
 import sys
+import tkinter.font as tkFont
+import tkinter.ttk as ttk
+import tkinter as tk
+
 class Power_Plant(object):
 
 
@@ -80,28 +82,11 @@ class Solar_Power_Plant(Power_Plant):
 				energy_production_list.append(energy_produced)
 				day_list.append((time, energy_produced, self.get_area(), self.get_material_constant(), sun_factor, latitude, energy_produced_tuple[1]))
 			latitude_dict[latitude] = day_list
-		'''	if energy_produced >= max_value:
-				max_value = energy_produced
 
-			elif energy_produced <= min_value:
-				min_value = energy_produced
-
-			if (time%30)==0 and time != 0:
-				print (time)
-				month_mean_value_list.append(super().calculate_mean_value(energy_production_list[time-30:time]))
-				month_standard_deviation_list.append(super().calculate_standard_deviation(energy_production_list[time-30:time]))
-				
-				min_list.append(min_value)
-				max_list.append(max_value)
-				max_value = 0
-				min_value = 0
-
-		mean_value = super().calculate_mean_value(energy_production_list)
-		standard_deviation = super().calculate_standard_deviation(energy_production_list)'''
 		return latitude_dict
 
 	def capabilities(self):
-		return "Area,soltal,latitud,dag,solighetsfaktor,f(t,latitud),W(t)"
+		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
 
 class Wind_Power_Plant(Power_Plant):
 
@@ -142,7 +127,8 @@ class Wind_Power_Plant(Power_Plant):
 		return wind_power_dict
 
 	def capabilities(self):
-		return "Rotordiameter, Dag, W(t), Vindvariation"
+		return "Rotor diameter, Day, W(t), Wind variation"
+
 class CustomDialog:
 
     def __init__(self, parent, message_box_title_list):
@@ -163,8 +149,10 @@ class CustomDialog:
         print ("value is", self.e.get())
         self.top.destroy()
 
-month_day_dict = {0: "Januari", 30: "Februari", 60: "Mars", 90: "April", 120:"Maj", 150: "Juni",
-					180: "Juli", 210:"Augusti", 240:"September", 270:"Oktober", 300:"November", 330:"December"}
+month_day_dict = {0: "January", 30: "February", 60: "Mars", 90: "April", 120:"May", 150: "June",
+					180: "July", 210:"August", 240:"September", 270:"October", 300:"November", 330:"December"}
+month_number_dict = {0: "January", 1: "February", 2: "Mars", 3: "April", 4:"May", 5: "June",
+					6: "July", 7:"August", 8:"September", 9:"October", 10:"November", 11:"December"}
 def calculate_mean_value(energy_production_list):
 
 	return sum(energy_production_list)/len(energy_production_list)
@@ -214,9 +202,9 @@ def main_function():
 			power_calculation(wind_power_plant)
 		elif arg == 3:
 			running = False
-def button_pressed(arg, root):
-	print (arg)
-	d = CustomDialog(root, ["stuff", "more stuff"])
+#def button_pressed(arg, root):
+#	print (arg)
+#	d = CustomDialog(root, ["stuff", "more stuff"])
 
 
 
@@ -243,6 +231,9 @@ def power_calculation(power_plant):
 			latitude = user_input_int_handler("Which latitude do you want to display? ", 1, index)
 			if arg == 2:
 				display_bar_graph(power_plant_dict, power_plant, energy_production_list)
+
+			elif arg == 1:
+				display_table(power_plant_dict, power_plant, energy_production_list)
 		elif arg == 3:
 			file_name = input("Enter a file name: ")
 			save_file(power_plant_dict, power_plant, file_name)
@@ -256,33 +247,45 @@ def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
 
 	root = tk.Tk()
 	root.title("Bar Graph")
-	canvas_width = 400
+	canvas_width = 600
 	canvas_height = 350
 	canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg = 'white')
 	canvas.pack()
 
-	y_stretch = 15
-	y_gap = 20
+	y_stretch = 0.1
+	y_gap = 10
 	x_stretch = 10
 	x_width = 20
-	x_gap = 20
+	x_gap = 100
 	for x, y in enumerate(data): #Calculates the rectangle coordinates for each bar
 		x0 = x*x_stretch + x*x_width + x_gap #Bottom left
 		y0 = canvas_height - (y * y_stretch + y_gap) # top left
 		x1 = x * x_stretch + x*x_width + x_width + x_gap # bottom right
 		y1 = canvas_height - y_gap #top right
 		canvas.create_rectangle(x0, y0, x1, y1, fill="red")
-		canvas.create_text(x0+2, y0, anchor=tk.SW, text=str("%.2f" % round(y,2)))
+		canvas.create_text(x0-10, y0, anchor=tk.SW, text=str("%.1f" % round(y,1)))
+		canvas.create_text(x1-20, y1+15, anchor=tk.SW, text=month_number_dict[x][0:3])
 	root.mainloop()
 
-def display_table(power_plant_dict, power_plant, latitude, energy_production_list):
+def display_table(power_plant_dict, power_plant, energy_production_list):
+	energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
 	root = tk.Tk()
 	root.title("Table")
-	canvas_width = 400
-	canvas_height = 350
-	canvas = tk.Canvas(root, width=canvas_width, height=canvas_height, bg = 'white')
-	canvas.pack()
-
+	table = Table(root, 13, 5)
+	table.pack(side ="top", fill="x")
+	table.set(0,0, "Month")
+	table.set(0,1, "Mean Value")
+	table.set(0,2, "Standard deviation")
+	table.set(0,3, "Min value")
+	table.set(0,4, "Max value")
+	print(energy_tuple)
+	print(len(energy_tuple[2]))
+	for index in range(12):
+		table.set(index+1, 0, month_number_dict[index])
+		table.set(index+1, 1, str("%.4f" % round(energy_tuple[2][index],4)))
+		table.set(index+1, 2, str("%.4f" % round(energy_tuple[3][index], 4)))
+		table.set(index+1, 3, str("%.4f" % round(energy_tuple[1][index], 4)))
+		table.set(index+1, 4, str("%.4f" % round(energy_tuple[0][index], 4)))
 
 def energy_produced_per_month(power_plant, energy_production_list):
 	max_list = []
@@ -291,7 +294,8 @@ def energy_produced_per_month(power_plant, energy_production_list):
 	month_standard_deviation_list = []
 	max_value = 0
 	min_value = 0
-	for time, energy_produced in enumerate(energy_production_list):
+	time = 1
+	for energy_produced in energy_production_list:
 
 		if energy_produced >= max_value:
 			max_value = energy_produced
@@ -308,7 +312,7 @@ def energy_produced_per_month(power_plant, energy_production_list):
 			max_list.append(max_value)
 			max_value = 0
 			min_value = 0	
-
+		time +=1
 	return (max_list, min_list, month_mean_value_list, month_standard_deviation_list)
 
 def save_file(power_plant_dict, power_plant, file_name):
@@ -365,6 +369,26 @@ def user_input_float_handler(prompt, lower_lim, upper_lim):
 			return user_input
 		except:
 			print("This is no float, try again: ")
+
+class Table(tk.Frame):
+	def __init__(self, parent, rows=12, columns=5):
+		tk.Frame.__init__(self, parent, background="black")
+		self._widgets = []
+		for row in range(rows):
+			current_row = []
+			for column in range(columns):
+				label = tk.Label(self, text="%s/%s" % (row, column), borderwidth=0, width=15)
+				label.grid(row=row, column=column, sticky="nsew", padx=1, pady=1)
+				current_row.append(label)
+
+			self._widgets.append(current_row)
+		for column in range(columns):
+			self.grid_columnconfigure(column, weight=1)
+
+	def set(self, row, column, value):
+		widget = self._widgets[row][column]
+		widget.configure(text=value)
+
 main_function()
 
 
