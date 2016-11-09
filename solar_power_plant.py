@@ -1,112 +1,10 @@
-
-import random
+from power_plant import Solar_Power_Plant, Wind_Power_Plant
 import math
 import types
 import sys
 import tkinter.font as tkFont
 import tkinter.ttk as ttk
 import tkinter as tk
-
-
-class Solar_Power_Plant(object):
-
-	def __init__(self, area, material_constant, latitude_list):
-		self.area = area
-		self.material_constant = material_constant
-		self.latitude_list = latitude_list
-	
-	def get_area(self):
-		return self.area
-
-	def get_material_constant(self):
-		return self.material_constant
-	def solar_energy_calculator(self, sun_factor, time, latitude):
-		latitude_time = self.latitude_time(time, latitude)
-		return (self.get_area()*self.get_material_constant()*sun_factor*latitude_time, latitude_time)
-
-	def latitude_time(self, time, latitude):
-		#0<latitude<90
-		v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90
-		if v > 0 and v < 1:
-			return v*v
-		elif v >= 1:
-			return 1
-		else: #v < 0
-			return 0
-
-	def energy_calculator(self):
-		latitude_dict = {}
-
-	#latitude_list.append(lat_2)
-		for latitude in self.latitude_list:
-			
-			energy_production_list = []
-			month_mean_value_list =[]
-			month_standard_deviation_list = []
-			#stores data from each day. One tuple per index(day) (Area, material constant, sun factor, latitude, W, f(t,lat))
-			day_list = []
-
-			max_value = 0
-			min_value = 0
-			#Index identifies month, value identifies actual value.
-			max_list = []
-			min_list = []
-
-			for time in range(360):
-				sun_factor = random.random()
-
-
-				energy_produced_tuple = self.solar_energy_calculator(sun_factor, time, latitude)
-				energy_produced = energy_produced_tuple[0]
-				energy_production_list.append(energy_produced)
-				day_list.append((time, energy_produced, self.get_area(), self.get_material_constant(), sun_factor, latitude, energy_produced_tuple[1]))
-			latitude_dict[latitude] = day_list
-
-		return latitude_dict
-
-	def capabilities(self):
-		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
-
-class Wind_Power_Plant(object):
-
-	def __init__(self, rotor_diameter):
-		#Rotor diameter can be 	25-50m
-		self.rotor_diameter = rotor_diameter
-
-	def get_rotor_diameter(self):
-		return self.rotor_diameter
-
-	def wind_variation(self, time):
-			big_wind_factor = 20
-			small_wind_factor = 10
-			rand_factor = random.random()
-			if time < 60:
-				return small_wind_factor*rand_factor
-			elif time < 150:
-				return big_wind_factor *rand_factor
-				
-			elif time < 270:
-				return small_wind_factor *rand_factor
-				
-			elif time < 330:
-				return big_wind_factor *rand_factor
-			else:
-				return small_wind_factor*rand_factor
-
-	def energy_calculator(self):
-		wind_power_dict = {}
-		day_list = []
-		for time in range(360):
-			wind_variation = self.wind_variation(time)
-			energy_produced = wind_variation*self.get_rotor_diameter()
-			day_list.append((time, energy_produced, wind_variation, self.get_rotor_diameter()))
-
-		
-		wind_power_dict[0] = day_list
-		return wind_power_dict
-
-	def capabilities(self):
-		return "Rotor diameter, Day, W(t), Wind variation"
 
 class CustomDialog:
 
@@ -142,7 +40,7 @@ def calculate_standard_deviation(energy_production_list):
 		total += math.pow((i - (sum(energy_production_list) / len(energy_production_list))), 2)
 	return math.sqrt((1/(len(energy_production_list)-1))*total)
 
-def main_function():
+def main_menu():
 	#root = Tk()
 	#solar_button = Button(root, text="Solar")
 	#wind_button = Button(root, text="Wind")
@@ -176,7 +74,7 @@ def main_function():
 			solar_plant = Solar_Power_Plant(area, material_constant, latitude_list)
 			power_calculation(solar_plant)
 		elif arg == 2:
-			rotor_diameter = user_input_float_handler("Enter rotor diameter: ", 25, 50)
+			rotor_diameter = user_input_float_handler("Enter rotor diameter: ", 25, 50) #min 25, max 50
 			wind_power_plant = Wind_Power_Plant(rotor_diameter)
 			power_calculation(wind_power_plant)
 		elif arg == 3:
@@ -200,8 +98,8 @@ def power_calculation(power_plant):
 	while running:
 		print("What do you want to do with the simulated data?")
 		arg = user_input_int_handler("1. Create a table \n2. Create a bar chart \n3. Save to file \n4. Go to main menu (data will be lost)", 1,4)
-
-		if arg == 1 or arg == 2 and type(power_plant).__name__ == "Solar_Power_Plant":
+		print (type(power_plant).__name__)
+		if type(power_plant).__name__ == "Solar_Power_Plant" and (arg == 1 or arg == 2):
 			print ("Latitudes: ")
 			index = 1
 			for key in power_plant_dict:
@@ -209,6 +107,15 @@ def power_calculation(power_plant):
 
 			latitude = user_input_int_handler("Which latitude do you want to display? ", 1, index)
 			
+			#Tuple with monthly data (max,min,mean,normal deviation)
+			energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
+
+			if arg == 2:
+				display_bar_graph(energy_tuple)
+
+			elif arg == 1:
+				display_table(energy_tuple)
+		elif arg == 1 or arg == 2:
 			#Tuple with monthly data (max,min,mean,normal deviation)
 			energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
 
@@ -332,7 +239,7 @@ def user_input_int_handler(prompt, lower_lim, upper_lim):
 	while True:
 		try:
 			user_input = int(input(prompt))
-			if user_input > upper_lim and user_input < lower_lim:
+			if user_input > upper_lim or user_input < lower_lim:
 				print("Wrong choice: try again")
 				continue
 			return user_input
@@ -343,7 +250,7 @@ def user_input_float_handler(prompt, lower_lim, upper_lim):
 	while True:
 		try:
 			user_input = float(input(prompt))
-			if user_input > upper_lim and user_input < lower_lim:
+			if user_input > upper_lim or user_input < lower_lim:
 				print("Wrong choice: try again")
 				continue
 
@@ -370,7 +277,7 @@ class Table(tk.Frame):
 		widget = self._widgets[row][column]
 		widget.configure(text=value)
 
-main_function()
+main_menu()
 
 
 
