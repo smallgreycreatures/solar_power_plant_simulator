@@ -208,20 +208,24 @@ def power_calculation(power_plant):
 				print(index, ". ", key)
 
 			latitude = user_input_int_handler("Which latitude do you want to display? ", 1, index)
+			
+			#Tuple with monthly data (max,min,mean,normal deviation)
+			energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
+
 			if arg == 2:
-				display_bar_graph(power_plant_dict, power_plant, energy_production_list)
+				display_bar_graph(energy_tuple)
 
 			elif arg == 1:
-				display_table(power_plant_dict, power_plant, energy_production_list)
+				display_table(energy_tuple)
 		elif arg == 3:
 			file_name = input("Enter a file name: ")
 			save_file(power_plant_dict, power_plant, file_name)
 		elif arg == 4:
 			return
 
-def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
+def display_bar_graph(energy_tuple):
 	
-	energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
+	#Gets the mean values
 	data = energy_tuple[2]
 
 	root = tk.Tk()
@@ -246,8 +250,7 @@ def display_bar_graph(power_plant_dict, power_plant, energy_production_list):
 		canvas.create_text(x1-20, y1+15, anchor=tk.SW, text=month_number_dict[x][0:3])
 	root.mainloop()
 
-def display_table(power_plant_dict, power_plant, energy_production_list):
-	energy_tuple = energy_produced_per_month(power_plant, energy_production_list)
+def display_table(energy_tuple):
 	root = tk.Tk()
 	root.title("Power Production Table")
 	table = Table(root, 13, 5)
@@ -283,7 +286,6 @@ def energy_produced_per_month(power_plant, energy_production_list):
 			min_value = energy_produced
 
 		if (time%30)==0 and time != 0:
-			print (time)
 			month_mean_value_list.append(calculate_mean_value(energy_production_list[time-30:time]))
 			month_standard_deviation_list.append(calculate_standard_deviation(energy_production_list[time-30:time]))
 				

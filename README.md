@@ -1,14 +1,14 @@
 # Solar Power Plant Simulator
 ##Challenges:
 If this program were written for a command line interface it would almost write itself. Estimated time spent on the actual calculation methods will be around one working day. The challenge for this application instead lies in providing usability. 
-In order to provide usability a Graphical User Interface(GUI) will be provided. Writing such can be painstakin, however for this project the utilization of open source libraries will minimize the work and hence the cost.
+In order to provide usability a Graphical User Interface(GUI) will be provided in order to create a good overview over the data. Writing such can be painstaking, however for this project the utilization of open source libraries will minimize the work and hence the cost.
 
 The amount of time put into this project will be low and the program will be held simple which makes it easy to maintain. It will be written in a general way which will enable future extensions to be included easily.
 
 ##Use Cases:
-Tom wants to see how much energy a solar power plant of the size 200m^2 outside of Stockholm would generate. Tom starts the program, chooses to simulate a solar power plant and inputs the latitude of Stockholm in a text box. He also inputs the power plants area and the material constant in simliar textboxes. The program responds with a dialog window which asks if Tom want to see the data as a bar chart, a table or save the data to a file. Tom chooses to save the data in a file and then quits the program through pressing the x button in the corner. He later visualizes the data in MatLab and compares it with data generated from other sessions.
+Tom wants to see how much energy a solar power plant of the size 200m^2 outside of Stockholm would generate. Tom starts the program, chooses to simulate a solar power plant and inputs the latitude of Stockholm in the console. He also inputs the power plants area and the material constant. The program responds and asks if Tom want to see the data as a bar chart, a table or save the data to a file. Tom chooses to save the data in a file and then quits the program. He later visualizes the data in MatLab and compares it with data generated from other sessions.
 
-Linda wants to see how the energy production for a solar plant outside of Tokyo would vary during a years time. She starts the program and choose to simulate a solar power plant. She inputs the material constans, the area of the cells and the latitude of Tokyo in the text boxes. The program reponds with a dialog window which asks if she wants to see the data as a bar chart, in a table or save it to a file. Linda chooses to see the data as a diagram. A bar chart is presented and Linda sees that during March the production is very low outside of Tokyo. She has to investigate why and therefore quits the program through a keyboard command.
+Linda wants to see how the energy production for a solar plant outside of Tokyo would vary during a years time. She starts the program and choose to simulate a solar power plant. She inputs the material constans, the area of the cells and the latitude of Tokyo in the terminal. The program reponds and asks if she wants to see the data as a bar chart, in a table or save it to a file. Linda chooses to see the data as a bar chart. A bar chart is presented and Linda sees that during March the production is very low. She has to investigate why and therefore quits the program.
 
 ##Model:
 
@@ -16,15 +16,11 @@ Linda wants to see how the energy production for a solar plant outside of Tokyo 
 class Power_Plant(object):
 	"""Super class for power plants."""
 
-	def calculate_mean_value(energy_production_list):
-		"""Calculates the mean value of energy produced during a given time. The number of items in the list is considered to give the time."""
 
-	def calculate_standard_deviation(energy_production_list):
-	"""Calculates the standard deviation of the energy produced during a period of time. The number of items in the list is considered to give the time."""
 
 class Solar_Power_Plant(object):
 
-	def __init__(self, area, material_constant):
+	def __init__(self, area, material_constant, latitude_list):
 		"""Constructor that sets the class variables"""
 	
 	def get_area(self):
@@ -33,12 +29,13 @@ class Solar_Power_Plant(object):
 	def get_material_constant(self):
 		"""Returns the material constant"""
 
-	def energy_caluclator(latitude):
-		"""Iterates over all days per year and for each day the energy generated is calculated through the calling of help methods. The function returns a tuple with the standard deviation, mean value and two lists. One with the standard deviation for all months another with the mean value for all months, one with the max value for all month and one with the minimum value for all months.."""
+	def energy_caluclator():
+		"""Iterates over the latitudes in the list latitude_list and then iterates over all days per year and for each day the energy generated is calculated through the calling of help methods. The function returns dictionary where each element is a latitude. Each latitude holds a list of days where each day list contains a tuple per day on the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)
 
 	def solar_energy_calculator(sun_factor, time, latitude):
 		"""Help method for energy_calculator that calculates 
 			the formula W(t) = area·material_constant·sun_factor·latitude_time(t, latitude)."""
+
 	def latitude_time(time, latitude):
 		"""Calculates v = ((23.5)·sin((pi(time-80))/180)+90-latitude)/90 for latitudes 0 < latitude < 90"""
 
@@ -49,30 +46,37 @@ class Wind_Power_Plant(object):
 
 	def get_rotor_diameter(self):
 		"""Returns rotor diameter"""
-	def wind_power_plant_calculator(wind_power_plant, time):
-		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The prodcution is season dependent because of stronger winds in spring and autumn. The function returns a tuple with the standard deviation, mean value and four lists. One with the standard deviation for all months another with the mean value for all months, one with the max value for all month and one with the minimum value for all months."""
+
+    def wind_variation(self, time):
+        """Function that defines how the wind varies during the year. More wind in spring and autumn."""
+
+	def energy_calculator(self):
+		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The prodcution is season dependent because of stronger winds in spring and autumn. The function returns dictionary containing one element with key 0. This element is a list of all days where each day is represented as a tuple of the form(time, energy_produced,wind_variation, rotor_diameter)
 
 
-def main_menu():
-	"""Function that handles the user interaction when the user is in the main menu. It can here choose to calculate wind or solar."""
+def main_function():
+	"""Function that handles the user interaction when the user is in the main menu. The user here chooses wind or solar and is asked to input the required data. A power plant object is then created."""
 
-def calculate_solar_power():
-	"""User interaction function which asks for input data. Latitudes, area, material constant and presents the generated data."""
+def power_calculation(power_plant):
+	"""The energy_calculator() method is called and the result is stored in a variable. The user is asked what to do with the data (Table, Bar chart, save to file, discard)."""
 
-def calculate_wind_power():
-	"""Ask for the rotor diameter and presents the generated wind data."""
-
-def save_to_file():
+def save_to_file(power_plant_dict, power_plant, file_name):
 	"""Saves the generated data to a file"""
 
-def generate_bar_chart():
-	"""Generates a bar chart through plotpy"""
+def display_bar_graph(energy_produced_per_month):
+	"""Generates a bar graph through tkinter"""
 
-def generate_table():
+def generate_table(energy_produced_per_month):
 	"""Generate tables"""
 
-def user_input_cleaner():
+def user_input_cleaner(prompt):
 	"""Checks the user inputs for error."""
+
+def calculate_mean_value(energy_production_list):
+"""Calculates the mean value of energy produced during a given time. The number of items in the list is considered to give the time."""
+
+def calculate_standard_deviation(energy_production_list):
+"""Calculates the standard deviation of the energy produced during a period of time. The number of items in the list is considered to give the time."""
 
 def quit():
 	"""Exits the program"""
