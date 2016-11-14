@@ -262,6 +262,7 @@ class Table(tk.Frame):
 	def __init__(self, parent, rows=12, columns=5):
 		tk.Frame.__init__(self, parent, background="black")
 		self._widgets = []
+		#self.bind_all("<control-q>", self.quit)
 		for row in range(rows):
 			current_row = []
 			for column in range(columns):
