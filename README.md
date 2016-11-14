@@ -51,7 +51,7 @@ class Wind_Power_Plant(object):
         """Function that defines how the wind varies during the year. More wind in spring and autumn."""
 
 	def energy_calculator(self):
-		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The prodcution is season dependent because of stronger winds in spring and autumn. The function returns dictionary containing one element with key 0. This element is a list of all days where each day is represented as a tuple of the form(time, energy_produced,wind_variation, rotor_diameter)
+		"""Iterates over all days per year and calculates how much energy the wind power plant produces. The production is season dependent because of stronger winds in spring and autumn. The function returns dictionary containing one element with key 0. This element is a list of all days where each day is represented as a tuple of the form(time, energy_produced,wind_variation, rotor_diameter)
 
 
 def main_menu():

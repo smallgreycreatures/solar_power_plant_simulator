@@ -12,10 +12,13 @@ class Solar_Power_Plant(object):
 
 	def get_material_constant(self):
 		return self.material_constant
+
+		#calculates energy produced with formula W(t) = area·material_constant·sun_factor·latitude_time(t, latitude)
 	def solar_energy_calculator(self, sun_factor, time, latitude):
 		latitude_time = self.latitude_time(time, latitude)
 		return (self.get_area()*self.get_material_constant()*sun_factor*latitude_time, latitude_time)
 
+		#Decides what each latitude gives for solar value, help function to solar_energy_calculator
 	def latitude_time(self, time, latitude):
 		#0<latitude<90
 		v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90
@@ -26,6 +29,10 @@ class Solar_Power_Plant(object):
 		else: #v < 0
 			return 0
 
+			"""Calculates energy produced each day for 360 days.
+			Returns dictionary where each element is a latitude. 
+			Each latitude holds a list of days where each day list contains a tuple per day on 
+			the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)"""
 	def energy_calculator(self):
 		latitude_dict = {}
 
@@ -68,6 +75,7 @@ class Wind_Power_Plant(object):
 	def get_rotor_diameter(self):
 		return self.rotor_diameter
 
+		#Decides how the wind varies. It's windier during autumn and spring (month 3-5 and 9-11).
 	def wind_variation(self, time):
 			big_wind_factor = 20
 			small_wind_factor = 10
@@ -84,7 +92,9 @@ class Wind_Power_Plant(object):
 				return big_wind_factor *rand_factor
 			else:
 				return small_wind_factor*rand_factor
-
+	"""The function returns dictionary containing one element with key 0.
+	This element is a list of all days where each day is represented as a tuple of
+	the form(time, energy_produced,wind_variation, rotor_diameter) """
 	def energy_calculator(self):
 		wind_power_dict = {}
 		day_list = []
