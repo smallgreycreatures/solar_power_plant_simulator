@@ -82,21 +82,21 @@ class Wind_Power_Plant(object):
 		
 	def wind_variation(self, time):
 		"""Decides how the wind varies. It's windier during autumn and spring (month 3-5 and 9-11)."""
-			big_wind_factor = 20
-			small_wind_factor = 10
-			rand_factor = random.random()
-			if time < 60:
-				return small_wind_factor*rand_factor
-			elif time < 150:
-				return big_wind_factor *rand_factor
+		big_wind_factor = 20
+		small_wind_factor = 10
+		rand_factor = random.random()
+		if time < 60:
+			return small_wind_factor*rand_factor
+		elif time < 150:
+			return big_wind_factor *rand_factor
 				
-			elif time < 270:
-				return small_wind_factor *rand_factor
+		elif time < 270:
+			return small_wind_factor *rand_factor
 				
-			elif time < 330:
-				return big_wind_factor *rand_factor
-			else:
-				return small_wind_factor*rand_factor
+		elif time < 330:
+			return big_wind_factor *rand_factor
+		else:
+			return small_wind_factor*rand_factor
 
 	
 	def energy_calculator(self):
