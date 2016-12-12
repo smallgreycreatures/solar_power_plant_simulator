@@ -8,62 +8,65 @@ class Solar_Power_Plant(object):
 		self.latitude_list = latitude_list
 	
 	def get_area(self):
+		"""return the area of the solar panels"""
 		return self.area
 
 	def get_material_constant(self):
+		"""returns the material constant"""
 		return self.material_constant
 
-		#calculates energy produced with formula W(t) = area·material_constant·sun_factor·latitude_time(t, latitude)
+	
 	def solar_energy_calculator(self, sun_factor, time, latitude):
+		"""calculates energy produced with formula W(t) = 
+		area·material_constant·sun_factor·latitude_time(t, latitude)
+		return W(t) and the returned value from latitude_time in a tuple."""
 		latitude_time = self.latitude_time(time, latitude)
 		return (self.get_area()*self.get_material_constant()*sun_factor*latitude_time, latitude_time)
 
-		#Decides what each latitude gives for solar value, help function to solar_energy_calculator
+		
 	def latitude_time(self, time, latitude):
-		#0<latitude<90
+		"""Decides what each latitude gives for solar value, help function to solar_energy_calculator"""
+		
+		#for 0<latitude<90: this is the formula mentioned in the f(x) section in the spec
 		v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90
+		
 		if v > 0 and v < 1:
 			return v*v
+
 		elif v >= 1:
 			return 1
+
 		else: #v < 0
 			return 0
 
-			"""Calculates energy produced each day for 360 days.
-			Returns dictionary where each element is a latitude. 
-			Each latitude holds a list of days where each day list contains a tuple per day on 
-			the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)"""
+			
 	def energy_calculator(self):
+		"""Calculates energy produced each day for 360 days.
+		Returns dictionary where each element is a latitude. 
+		Each latitude holds a list of days where each day list contains a tuple per day on 
+		the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)"""
+		
+		#stores data from each latitude
 		latitude_dict = {}
 
-	#latitude_list.append(lat_2)
 		for latitude in self.latitude_list:
-			
-			energy_production_list = []
-			month_mean_value_list =[]
-			month_standard_deviation_list = []
+
 			#stores data from each day. One tuple per index(day) (Area, material constant, sun factor, latitude, W, f(t,lat))
 			day_list = []
 
-			max_value = 0
-			min_value = 0
-			#Index identifies month, value identifies actual value.
-			max_list = []
-			min_list = []
-
-			for time in range(360):
+			for time in range(360): #360 days per year
 				sun_factor = random.random()
 
-
+				#Stores energy produced that day as [0] and the value from latitude_time() as [1]
 				energy_produced_tuple = self.solar_energy_calculator(sun_factor, time, latitude)
 				energy_produced = energy_produced_tuple[0]
-				energy_production_list.append(energy_produced)
 				day_list.append((time, energy_produced, self.get_area(), self.get_material_constant(), sun_factor, latitude, energy_produced_tuple[1]))
 			latitude_dict[latitude] = day_list
 
 		return latitude_dict
 
 	def capabilities(self):
+		"""returns a string with the data labels from the solar plant"""
 		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
 
 class Wind_Power_Plant(object):
@@ -73,10 +76,12 @@ class Wind_Power_Plant(object):
 		self.rotor_diameter = rotor_diameter
 
 	def get_rotor_diameter(self):
+		"""returns rotot diameter"""
 		return self.rotor_diameter
 
-		#Decides how the wind varies. It's windier during autumn and spring (month 3-5 and 9-11).
+		
 	def wind_variation(self, time):
+		"""Decides how the wind varies. It's windier during autumn and spring (month 3-5 and 9-11)."""
 			big_wind_factor = 20
 			small_wind_factor = 10
 			rand_factor = random.random()
@@ -92,11 +97,17 @@ class Wind_Power_Plant(object):
 				return big_wind_factor *rand_factor
 			else:
 				return small_wind_factor*rand_factor
-	"""The function returns dictionary containing one element with key 0.
-	This element is a list of all days where each day is represented as a tuple of
-	the form(time, energy_produced,wind_variation, rotor_diameter) """
+
+	
 	def energy_calculator(self):
+		"""The function returns dictionary containing one element with key 0.
+		This element is a list of all days where each day is represented as a tuple of
+		the form(time, energy_produced,wind_variation, rotor_diameter) """
+		
+		#Stores a list of tuples. Only contains one element
 		wind_power_dict = {}
+		#Contains a tuple with the daily data from the wind power plant
+		#on the form (time,energy produced,wind variation, rotor diameter)
 		day_list = []
 		for time in range(360):
 			wind_variation = self.wind_variation(time)
@@ -108,4 +119,5 @@ class Wind_Power_Plant(object):
 		return wind_power_dict
 
 	def capabilities(self):
+		"""returns a string with the data labels from the wind plant"""
 		return "Rotor diameter, Day, W(t), Wind variation"
