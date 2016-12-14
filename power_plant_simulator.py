@@ -43,15 +43,16 @@ def main_menu():
 			#stores inputed latitudes
 			latitude_list = []
 			for latitudes in range(number_of_latitudes):
-				latitude = user_input_float_handler("Enter a latitude: ", 0, 90)
+				latitude = user_input_float_handler("Enter a latitude (0<latitude<90): ", 0, 90, False)
 				latitude_list.append(latitude)
-			area = user_input_float_handler("Enter the area: ", 0, 1000) #max 1000m^2
-			material_constant = user_input_float_handler("Enter material constant: ", 0, 10) #max 10kWh/m^2
+
+			area = user_input_float_handler("Enter the area (0<area<1000) in square meter: ", 0, 1000, False) #max 1000m^2
+			material_constant = user_input_float_handler("Enter material constant (0<constant<10): ", 0, 10, False) #max 10kWh/m^2
 			solar_plant = Solar_Power_Plant(area, material_constant, latitude_list)
 			power_calculation(solar_plant)
 
 		elif arg == 2: #Wind power plant choosen
-			rotor_diameter = user_input_float_handler("Enter rotor diameter: ", 25, 50) #min 25, max 50
+			rotor_diameter = user_input_float_handler("Enter rotor diameter(25<=diameter<=50): ", 25, 50, True) #min 25, max 50
 			wind_power_plant = Wind_Power_Plant(rotor_diameter)
 			power_calculation(wind_power_plant)
 
@@ -212,8 +213,8 @@ def save_file(power_plant_dict, power_plant, file_name):
 	data = column_headers + "\n"
 	for identifier in power_plant_dict: #for solar this is latitude, wind 0
 		day_data_list = power_plant_dict[identifier]
+
 		for day_data_tuple in day_data_list:
-			
 			day = day_data_tuple[0]
 			energy_produced = day_data_tuple[1]
 
@@ -225,21 +226,23 @@ def save_file(power_plant_dict, power_plant, file_name):
 				rotor_diameter = day_data_tuple[3]
 				data += (str(rotor_diameter) + "\t" + str(day) + "\t" + str(energy_produced) + "\t" + str(wind_variation) + "\n")
 
-			elif len(day_data_tuple) == 6:	#Customization for solar plant
+			elif len(day_data_tuple) == 7:	#Customization for solar plant
 				area = day_data_tuple[2]
 				material_constant = day_data_tuple[3]
 				sun_factor = day_data_tuple[4]
 				latitude = day_data_tuple[5]
 				energy_function = day_data_tuple[6]
-
+				#print("in like flynn")
 				data += (str(area) +"\t" + str(material_constant) +"\t" + str(latitude) +"\t" + str(sun_factor) +"\t" + str(energy_produced) +"\t" + str(energy_function) + "\n")
+			
 	file = open(file_name, "w")
-
+	#print(data)
 	file.write(data)
 	file.close()
 			
 def user_input_int_handler(prompt, lower_lim, upper_lim):
-	""" Cleans user input for ints. A upper limit and lower limit of numbers allowed are also set"""
+	""" Cleans user input for ints. A upper limit and lower limit of numbers allowed are also set
+	params are prompt with text to user, lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed"""
 	while True:
 		try:
 			user_input = int(input(prompt))
@@ -250,14 +253,20 @@ def user_input_int_handler(prompt, lower_lim, upper_lim):
 		except:
 			print("This is no interger, try again: ")
 
-def user_input_float_handler(prompt, lower_lim, upper_lim):
-	""" Cleans user input for floats. A upper limit and lower limit of numbers allowed are also set"""
+def user_input_float_handler(prompt, lower_lim, upper_lim, greq):
+	""" Cleans user input for floats. A upper limit and lower limit of numbers allowed are also set
+	params are prompt with text to user, lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed
+	and greq is true or false dependent on you want greater or equal or greater than on upper and lower lim."""
 	while True:
 		try:
 			user_input = float(input(prompt))
-			if user_input > upper_lim or user_input < lower_lim:
+			if (user_input >= upper_lim or user_input <= lower_lim) and not greq:
 				print("Wrong choice: try again")
 				continue
+
+			elif (user_input > upper_lim or user_input < lower_lim) and greq:
+				print("Wrong choice: try again")
+				continue	
 
 			return user_input
 		except:
@@ -267,6 +276,8 @@ def user_input_float_handler(prompt, lower_lim, upper_lim):
 class Table(tk.Frame):
 	"""Specialized class for tkinter to handle tables. Creates one row as a list of labels which enables change."""
 	def __init__(self, parent, rows=12, columns=5):
+		"""constructor for the tkinter table, generates rows and columns. takes
+		the parent container, number of rows and number of columns as parameters"""
 		tk.Frame.__init__(self, parent, background="black")
 		self._widgets = []
 		self.bind("<Control-q>", self.quit)
@@ -284,7 +295,9 @@ class Table(tk.Frame):
 
 	
 	def set(self, row, column, value):
-		"""Makes it possible to set values in the cells"""
+		"""Makes it possible to set values in the cells
+		takes in tkinter widgets identified as row and column in the table and the 
+		value you want to fill the [row][column] with."""
 		widget = self._widgets[row][column]
 		widget.configure(text=value)
 
