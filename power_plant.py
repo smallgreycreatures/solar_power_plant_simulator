@@ -1,10 +1,26 @@
+"""Author=Frans Nordén, Date=2016-12-14"""
 import random
 import math
+""" The main data structure is the power_plant_dict. This is a dictionary where each element (for solar power plants) is a latitude. 
+		Each latitude holds a list of days where each day list contains a tuple per day on 
+		the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)
+
+		For wind power plants the dictionary just contains one entry with key 0.
+		This element is a list of all days where each day is represented as a tuple of
+		the form(time, energy_produced,wind_variation, rotor_diameter)
+		"""
+
 class Solar_Power_Plant(object):
+	"""Describes an abstraction of a solar power plant mainly used for 
+	calculating how much power it produces dependent on which latitude 
+	it is situated in. Variables such as panel area and the material constant
+	also effects the result."""
 
 	def __init__(self, area, material_constant, latitude_list):
-		self.area = area
-		self.material_constant = material_constant
+		"""Takes area (float), material_constant(float) and latitude list
+		which is a list of latitudes as input params and store those as class variables."""
+		self.area = area#max 1000m^2
+		self.material_constant = material_constant#max 10kWh/m^2
 		self.latitude_list = latitude_list
 	
 	def get_area(self):
@@ -19,13 +35,18 @@ class Solar_Power_Plant(object):
 	def solar_energy_calculator(self, sun_factor, time, latitude):
 		"""calculates energy produced with formula W(t) = 
 		area·material_constant·sun_factor·latitude_time(t, latitude)
+		from the input params sun_factor(float)(how much the sun shines), time(int) which means which day 
+		number of the year and latitude(float) which is a latitude.
 		return W(t) and the returned value from latitude_time in a tuple."""
 		latitude_time = self.latitude_time(time, latitude)
 		return (self.get_area()*self.get_material_constant()*sun_factor*latitude_time, latitude_time)
 
 		
 	def latitude_time(self, time, latitude):
-		"""Decides what each latitude gives for solar value, help function to solar_energy_calculator"""
+		"""Decides what each latitude gives for solar value, help function to solar_energy_calculator.
+		Takes time which is day number of a year and a latitude as input parameters and calculates with
+		the formula v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90.
+		Return v*v if v>0 & v<1, 1 if v>= 1 else 0"""
 		
 		#for 0<latitude<90: this is the formula mentioned in the f(x) section in the spec
 		v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90
@@ -55,7 +76,7 @@ class Solar_Power_Plant(object):
 			day_list = []
 
 			for time in range(360): #360 days per year
-				sun_factor = random.random()
+				sun_factor = random.random() #generates a random number 0=<n=<1 as described in 137.pdf
 
 				#Stores energy produced that day as [0] and the value from latitude_time() as [1]
 				energy_produced_tuple = self.solar_energy_calculator(sun_factor, time, latitude)
@@ -70,9 +91,12 @@ class Solar_Power_Plant(object):
 		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
 
 class Wind_Power_Plant(object):
-
+	"""Describes an abstraction of a wind power plant mainly used for 
+	calculating how much power it produces dependent on the rotor size. """
+	
 	def __init__(self, rotor_diameter):
-		#Rotor diameter can be 	25-50m
+		"""Takes the diameter for the rotor as input parameter and stores 
+		as class variable. Rotor diameter can be 25-50m."""
 		self.rotor_diameter = rotor_diameter
 
 	def get_rotor_diameter(self):
