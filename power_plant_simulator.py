@@ -84,22 +84,6 @@ def extract_energy_production_list(power_plant_dict, latitude):
 
 	return energy_production_list
 
-def selectionSort(alist, b):
-	for fillslot in range(len(alist)-1,0,-1):
-		positionOfMax=0
-		for location in range(1,fillslot+1):
-			if alist[location]<alist[positionOfMax]:
-				positionOfMax = location
-
-		temp = alist[fillslot]
-		temp2 = b[fillslot]
-		alist[fillslot] = alist[positionOfMax]
-		b[fillslot] = b[positionOfMax]
-		alist[positionOfMax] = temp
-		b[positionOfMax] = temp2
-	print(alist)
-	print(b)
-
 def bubblesort_for_two_lists(A, B):
 	"""Simple sorting algorithm for two lists. Takes List A and B as input
 	and sorts decreasing order list A and keeps track of the elements of B so that the
