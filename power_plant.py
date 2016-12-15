@@ -2,8 +2,8 @@
 import random
 import math
 """ The main data structure is the power_plant_dict. This is a dictionary where each element (for solar power plants) is a latitude. 
-		Each latitude holds a list of days where each day list contains a tuple per day on 
-		the form (time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)
+		Each latitude holds a list of days where each day list contains a tuple per day on the form 
+		(time, energy_produced, area, material_constant, sun_factor, latitude, latitude_time function value)
 
 		For wind power plants the dictionary just contains one entry with key 0.
 		This element is a list of all days where each day is represented as a tuple of
@@ -37,13 +37,14 @@ class Solar_Power_Plant(object):
 		area·material_constant·sun_factor·latitude_time(t, latitude)
 		from the input params sun_factor(float)(how much the sun shines), time(int) which means which day 
 		number of the year and latitude(float) which is a latitude.
-		return W(t) and the returned value from latitude_time in a tuple."""
+		return W(t) and the returned value from latitude_time function in a tuple."""
 		latitude_time = self.latitude_time(time, latitude)
 		return (self.get_area()*self.get_material_constant()*sun_factor*latitude_time, latitude_time)
 
 		
 	def latitude_time(self, time, latitude):
-		"""Decides what each latitude gives for solar value, help function to solar_energy_calculator.
+		"""Decides what each latitude gives for solar value(how much the sun shines), 
+		help function to solar_energy_calculator.
 		Takes time which is day number of a year and a latitude as input parameters and calculates with
 		the formula v = (23.5*math.sin((math.pi*(time-80))/180) + 90 - latitude)/90.
 		Return v*v if v>0 & v<1, 1 if v>= 1 else 0"""
@@ -88,7 +89,7 @@ class Solar_Power_Plant(object):
 
 	def capabilities(self):
 		"""returns a string with the data labels from the solar plant"""
-		return "Area, Sun factor, Latitude ,Day ,Sun factor ,f(t,latitude), W(t)"
+		return "Day Material Constant Latitude  Area \t Sun factor \t \tf(t,latitude) \t \t W(t)"
 
 class Wind_Power_Plant(object):
 	"""Describes an abstraction of a wind power plant mainly used for 
@@ -100,7 +101,7 @@ class Wind_Power_Plant(object):
 		self.rotor_diameter = rotor_diameter
 
 	def get_rotor_diameter(self):
-		"""returns rotot diameter"""
+		"""returns rotor diameter"""
 		return self.rotor_diameter
 
 		
@@ -124,7 +125,7 @@ class Wind_Power_Plant(object):
 
 	
 	def energy_calculator(self):
-		"""The function returns dictionary containing one element with key 0.
+		"""The function returns a dictionary containing one element with key 0.
 		This element is a list of all days where each day is represented as a tuple of
 		the form(time, energy_produced,wind_variation, rotor_diameter) """
 		
@@ -144,4 +145,4 @@ class Wind_Power_Plant(object):
 
 	def capabilities(self):
 		"""returns a string with the data labels from the wind plant"""
-		return "Rotor diameter, Day, W(t), Wind variation"
+		return "Day \t W(t) \t \t \t Wind variation \t Rotor diameter"

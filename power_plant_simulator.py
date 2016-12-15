@@ -20,23 +20,26 @@ import tkinter as tk
 		"""
 
 def get_month_by_day_number(day_number):
-	"""Connects a day number to a day. Simplified to 30 days per month"""
+	"""Connects a day number to a day 0 = jan, 30 = feb, 60 = mar, 90 = apr ... 330 = Dec. 
+	Numbers over 330 and less than 0 generate exception. Simplified to 30 days per month"""
 	month_day_dict = {0: "January", 30: "February", 60: "Mars", 90: "April", 120:"May", 150: "June",
 					180: "July", 210:"August", 240:"September", 270:"October", 300:"November", 330:"December"}
 	return month_day_dict[day_number]
 
 def get_month_by_number(month_number):
-	"""Connects the month number to the month name"""
+	"""Connects the month number to the month name. 0 = Jan, 1 = Feb, ... 11 = Dec. 
+	Numbers over 11 and less than 0 generate exception."""
 	month_number_dict = {0: "January", 1: "February", 2: "Mars", 3: "April", 4:"May", 5: "June",
 					6: "July", 7:"August", 8:"September", 9:"October", 10:"November", 11:"December"}
 	return month_number_dict[month_number]
 
 def calculate_mean_value(energy_production_list):
-	"""Calculates mean value. sum of the list / lenght of list"""
+	"""Calculates mean value. sum of the list / lenght of list. 
+	Energy production list is a list of numbers."""
 	return sum(energy_production_list)/len(energy_production_list)
 
 def calculate_standard_deviation(energy_production_list):
-	"""Calculates standard deviation of the energy in energy production list"""
+	"""Calculates standard deviation of the energy in energy production list (list of numbers)"""
 	total = 0
 	for i in energy_production_list:
 		total += math.pow((i - (sum(energy_production_list) / len(energy_production_list))), 2)
@@ -71,20 +74,6 @@ def main_menu():
 
 		elif arg == 3: #Exit application
 			running = False
-
-def extract_energy_production_list(power_plant_dict, latitude):
-	"""Extracts the energy production list from the power plant dict for
-		a given latitude (latitude 0 for wind plants)
-		Returns a list of the energy produced per day where the day is the index"""
-	energy_production_list = []
-
-	#extracting the energy produced per day from the dict. First step is extracting a list
-	day_data_list = power_plant_dict[latitude]
-	for day_data_tuple in day_data_list:
-		#For each tuple in the list (per day) there are produced energy stored at [1]
-		energy_production_list.append(day_data_tuple[1])
-
-	return energy_production_list
 
 def power_calculation(power_plant):
 	"""Calls the energy_calculator function for the parameter power plant and asks the user if it want to save data, generate a bar graph, 
@@ -156,6 +145,20 @@ def power_calculation(power_plant):
 		elif arg == 4:
 			return
 
+def extract_energy_production_list(power_plant_dict, latitude):
+	"""Extracts the energy production list from the power plant dict for
+		a given latitude (latitude = 0 for wind plants)
+		Returns a list of the energy produced per day where the day is the index"""
+	energy_production_list = []
+
+	#extracting the energy produced per day from the dict. First step is extracting a list
+	day_data_list = power_plant_dict[latitude]
+	for day_data_tuple in day_data_list:
+		#For each tuple in the list (per day) there are produced energy stored at [1]
+		energy_production_list.append(day_data_tuple[1])
+
+	return energy_production_list
+
 def create_latitude_and_energy_mean_value_list(power_plant_dict):
 	"""Extracts latitudes connected to energy produced per day. For the 
 	energy produced per day a mean value over the year is calculated.
@@ -179,7 +182,7 @@ def create_latitude_and_energy_mean_value_list(power_plant_dict):
 
 def display_bar_graph(energy_tuple):
 	"""Generates a bar graph with tkinter through a number of rectangels dependent of the number of months.
-	Takes an tuple of the form (power_plant object, list of energy produced per month)"""
+	Takes a tuple of the form (power_plant object, list of energy produced per month)"""
 
 	#Gets the mean values
 	data = energy_tuple[2]
@@ -225,9 +228,9 @@ def display_table(data_matrix, columns, rows, list_of_column_headers, list_of_ro
 		for col_num, list_in_matrix in enumerate(data_matrix):
 			table.set(row+1, col_num+1, str("%.4f" %round(list_in_matrix[row],4)))	
 
-def energy_produced_per_month(power_plant, energy_production_list):
-	"""Returns a tuple with monthly data (max,min,mean,normal deviation) from the energy produced per day. 
-	Takes the power plant object and a list of energy produced per day as parameters."""
+def energy_produced_per_month(energy_production_list):
+	"""Returns a tuple with monthly data in lists (max,min,mean,normal deviation) from the energy
+	produced per day. Takes the list of energy produced per day as parameter."""
 
 	#List for monthly max value
 	max_list = []
@@ -262,8 +265,9 @@ def energy_produced_per_month(power_plant, energy_production_list):
 	return (max_list, min_list, month_mean_value_list, month_standard_deviation_list)
 
 def save_file(power_plant_dict, power_plant, file_name):
-	"""Saves file with name as parameter file_name on the form defined in power_plant.capabilities().
-	Takes the power_plant_dict dictionary and an power_plant object as input parameters."""
+	"""Saves file with name as parameter file_name as a text file containing a table with column headers as
+	defined in power_plant.capabilities() and row headers as months. Does so for all stored latitudes (1 for wind).
+	Takes the power_plant_dict dictionary and a power_plant object as input parameters."""
 
 	column_headers = power_plant.capabilities()
 	data = column_headers + "\n"
@@ -280,7 +284,7 @@ def save_file(power_plant_dict, power_plant, file_name):
 			if len(day_data_tuple) == 4: #Customization for wind power plants
 				wind_variation = day_data_tuple[2]
 				rotor_diameter = day_data_tuple[3]
-				data += (str(rotor_diameter) + "\t" + str(day) + "\t" + str(energy_produced) + "\t" + str(wind_variation) + "\n")
+				data += (str(day+1) + "\t" + str(energy_produced) + "\t" + str(wind_variation) + "\t" + str(rotor_diameter) + "\n")
 
 			elif len(day_data_tuple) == 7:	#Customization for solar plant
 				area = day_data_tuple[2]
@@ -289,15 +293,15 @@ def save_file(power_plant_dict, power_plant, file_name):
 				latitude = day_data_tuple[5]
 				energy_function = day_data_tuple[6]
 				#print("in like flynn")
-				data += (str(area) +"\t" + str(material_constant) +"\t" + str(latitude) +"\t" + str(sun_factor) +"\t" + str(energy_produced) +"\t" + str(energy_function) + "\n")
+				data += (str(day) +"\t" + str(material_constant) +"\t \t" + str(latitude) +"\t" + str(area)+ "\t" + str(sun_factor) +"\t" + str(energy_produced) +"\t" + str(energy_function) + "\n")
 			
 	file = open(file_name, "w")
 	file.write(data)
 	file.close()
 			
 def user_input_int_handler(prompt, lower_lim, upper_lim):
-	""" Cleans user input for ints. A upper limit and lower limit of numbers allowed are also set
-	params are prompt with text to user, lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed"""
+	""" Cleans user input for ints. Params are prompt with text to user, 
+	lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed"""
 	while True:
 		try:
 			user_input = int(input(prompt))
@@ -309,8 +313,8 @@ def user_input_int_handler(prompt, lower_lim, upper_lim):
 			print("This is no interger, try again: ")
 
 def user_input_float_handler(prompt, lower_lim, upper_lim, greq):
-	""" Cleans user input for floats. A upper limit and lower limit of numbers allowed are also set
-	params are prompt with text to user, lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed
+	""" Cleans user input for floats. Params are prompt with text to user,
+	 lower_lim: the lower limit of the number allowed, upper_lim: upper limit of numbers allowed
 	and greq is true or false dependent on you want greater or equal or greater than on upper and lower lim."""
 	while True:
 		try:
