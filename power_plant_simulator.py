@@ -228,7 +228,7 @@ def display_table(data_matrix, columns, rows, list_of_column_headers, list_of_ro
 		for col_num, list_in_matrix in enumerate(data_matrix):
 			table.set(row+1, col_num+1, str("%.4f" %round(list_in_matrix[row],4)))	
 	root.mainloop()
-	
+
 def energy_produced_per_month(energy_production_list):
 	"""Returns a tuple with monthly data in lists (max,min,mean,normal deviation) from the energy
 	produced per day. Takes the list of energy produced per day as parameter."""
@@ -311,7 +311,7 @@ def user_input_int_handler(prompt, lower_lim, upper_lim):
 				continue
 			return user_input
 		except:
-			print("This is no interger, try again: ")
+			print("This is no integer, try again: ")
 
 def user_input_float_handler(prompt, lower_lim, upper_lim, greq):
 	""" Cleans user input for floats. Params are prompt with text to user,
