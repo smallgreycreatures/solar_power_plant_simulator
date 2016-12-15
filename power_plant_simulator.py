@@ -115,7 +115,7 @@ def power_calculation(power_plant):
 				energy_production_list = extract_energy_production_list(power_plant_dict, latitude)
 
 				#Tuple with monthly data (max,min,mean,normal deviation)
-				energy_matrix = energy_produced_per_month(power_plant, energy_production_list)
+				energy_matrix = energy_produced_per_month(energy_production_list)
 
 
 				display_bar_graph(energy_matrix)
@@ -125,7 +125,7 @@ def power_calculation(power_plant):
 			energy_production_list = extract_energy_production_list(power_plant_dict, 0)
 
 			#Tuple with monthly data (max,min,mean,normal deviation)
-			energy_matrix = energy_produced_per_month(power_plant, energy_production_list)
+			energy_matrix = energy_produced_per_month(energy_production_list)
 
 			if arg == 2:
 				display_bar_graph(energy_matrix)

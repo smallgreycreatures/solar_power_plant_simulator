@@ -29,6 +29,7 @@ def mimic_merge_sort(list_to_sort, list_that_mimic_sort_order):
 		i=0
 		j=0
 		k=0
+		#Compare left and right to pick the biggest element and put in final list
 		while i < len(left_half) and j < len(right_half):
 			if left_half[i] > right_half[j]:
 				list_to_sort[k]=left_half[i]
